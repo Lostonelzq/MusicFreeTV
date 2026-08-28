@@ -14,6 +14,7 @@ interface IIconButtonProps extends SvgProps {
     color?: string;
     onPress?: () => void;
     accessibilityLabel?: string;
+    hasTVPreferredFocus?: boolean;
 }
 export function IconButtonWithGesture(props: IIconButtonProps) {
     return <IconButton {...props} />;
@@ -28,6 +29,7 @@ export default function IconButton(props: IIconButtonProps) {
         onPress,
         name,
         accessibilityLabel,
+        hasTVPreferredFocus,
         ...iconProps
     } = props;
     const colors = useColors();
@@ -52,6 +54,7 @@ export default function IconButton(props: IIconButtonProps) {
         <TVPressable
             accessibilityRole="button"
             accessibilityLabel={accessibilityLabel}
+            hasTVPreferredFocus={hasTVPreferredFocus}
             onPress={onPress}
             style={[styles.button, style as any]}>
             {icon}

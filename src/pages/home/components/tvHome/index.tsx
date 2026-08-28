@@ -9,6 +9,7 @@ import MusicSheet, { useSheetsBase, useStarredSheets } from "@/core/musicSheet";
 import { ROUTE_PATH, useNavigate } from "@/core/router";
 import TrackPlayer, { useCurrentMusic, useMusicState } from "@/core/trackPlayer";
 import { musicIsPaused } from "@/utils/trackUtils";
+import rpx from "@/utils/rpx";
 import React, { useMemo, useState } from "react";
 import { FlatList, StyleSheet, View } from "react-native";
 
@@ -47,10 +48,12 @@ export default function TVHome() {
     return (
         <View style={styles.page}>
             <View style={styles.rail}>
-                <View style={styles.brandMark}>
-                    <Icon name="musical-note" color={TVColors.focus} size={32} />
+                <View style={styles.brandBlock}>
+                    <View style={styles.brandMark}>
+                        <Icon name="musical-note" color={TVColors.focus} size={rpx(32)} />
+                    </View>
+                    <ThemeText style={styles.brand}>MusicFreeTV</ThemeText>
                 </View>
-                <ThemeText style={styles.brand}>MusicFreeTV</ThemeText>
                 <View style={styles.railItems}>
                     {rail.map((item, index) => (
                         <TVPressable
@@ -61,7 +64,7 @@ export default function TVHome() {
                             onPress={item.action}
                             style={styles.railButton}>
                             <View style={styles.railButtonBody}>
-                                <Icon name={item.icon} color={TVColors.textSecondary} size={27} />
+                                <Icon name={item.icon} color={TVColors.textSecondary} size={rpx(27)} />
                                 <ThemeText style={styles.railLabel}>{item.label}</ThemeText>
                             </View>
                         </TVPressable>
@@ -97,9 +100,14 @@ export default function TVHome() {
                             <TVPressable
                                 accessibilityRole="button"
                                 accessibilityLabel={musicIsPaused(musicState) ? "播放" : "暂停"}
-                                onPress={() =>
-                                    musicIsPaused(musicState) ? TrackPlayer.play() : TrackPlayer.pause()
-                                }
+                                onPress={() => {
+                                    if (musicIsPaused(musicState)) {
+                                        TrackPlayer.play();
+                                        navigate(ROUTE_PATH.MUSIC_DETAIL);
+                                    } else {
+                                        TrackPlayer.pause();
+                                    }
+                                }}
                                 disabled={!currentMusic}
                                 style={styles.playButton}
                                 focusedStyle={styles.playButtonFocused}>
@@ -107,7 +115,7 @@ export default function TVHome() {
                                     <Icon
                                         name={musicIsPaused(musicState) ? "play" : "pause"}
                                         color={TVColors.canvas}
-                                        size={28}
+                                        size={rpx(28)}
                                     />
                                     <ThemeText style={styles.playButtonText}>
                                         {musicIsPaused(musicState) ? "播放" : "暂停"}
@@ -185,44 +193,45 @@ export default function TVHome() {
 
 const styles = StyleSheet.create({
     page: { flex: 1, flexDirection: "row", backgroundColor: TVColors.canvas },
-    rail: { width: TVMetrics.railWidth, paddingHorizontal: 24, paddingVertical: 26, backgroundColor: TVColors.surface },
-    brandMark: { width: 52, height: 52, borderRadius: 16, alignItems: "center", justifyContent: "center", backgroundColor: TVColors.brand },
-    brand: { marginTop: 14, fontSize: 23, fontWeight: "700", color: TVColors.text },
-    railItems: { flex: 1, justifyContent: "center", gap: 8 },
-    railButton: { width: "100%", height: 62 },
-    railButtonBody: { flex: 1, flexDirection: "row", alignItems: "center", paddingHorizontal: 16, gap: 15 },
-    railLabel: { color: TVColors.text, fontSize: 18, fontWeight: "600" },
-    railHint: { fontSize: 12, color: TVColors.textSecondary, lineHeight: 18 },
-    content: { flex: 1, paddingHorizontal: 38, paddingTop: 28 },
-    header: { flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20 },
-    eyebrow: { color: TVColors.brand, fontSize: 12, fontWeight: "800", letterSpacing: 2 },
-    title: { color: TVColors.text, fontSize: 30, fontWeight: "700", marginTop: 5 },
-    clockHint: { color: TVColors.textSecondary, fontSize: 13, letterSpacing: 2 },
-    hero: { height: 214, borderRadius: 22, overflow: "hidden", flexDirection: "row", backgroundColor: TVColors.raised, marginBottom: 22 },
-    heroImage: { width: 214, height: 214 },
-    heroCopy: { flex: 1, paddingHorizontal: 30, paddingVertical: 24, justifyContent: "center" },
-    heroTitle: { color: TVColors.text, fontSize: 29, fontWeight: "700", marginTop: 8 },
-    heroArtist: { color: TVColors.textSecondary, fontSize: 17, marginTop: 7 },
-    heroActions: { flexDirection: "row", gap: 14, marginTop: 20 },
-    playButton: { width: 132, height: 52, borderRadius: 26, backgroundColor: TVColors.play },
+    rail: { width: rpx(TVMetrics.railWidth), paddingHorizontal: rpx(24), paddingVertical: rpx(26), backgroundColor: TVColors.surface },
+    brandBlock: { width: "100%", alignItems: "center" },
+    brandMark: { width: rpx(52), height: rpx(52), borderRadius: rpx(16), alignItems: "center", justifyContent: "center", backgroundColor: TVColors.brand },
+    brand: { width: "100%", marginTop: rpx(14), textAlign: "center", fontSize: rpx(23), fontWeight: "700", color: TVColors.text },
+    railItems: { flex: 1, justifyContent: "center", gap: rpx(8) },
+    railButton: { width: "100%", height: rpx(62) },
+    railButtonBody: { flex: 1, flexDirection: "row", alignItems: "center", paddingHorizontal: rpx(16), gap: rpx(15) },
+    railLabel: { color: TVColors.text, fontSize: rpx(18), fontWeight: "600" },
+    railHint: { fontSize: rpx(12), color: TVColors.textSecondary, lineHeight: rpx(18) },
+    content: { flex: 1, paddingHorizontal: rpx(38), paddingTop: rpx(28) },
+    header: { flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start", marginBottom: rpx(20) },
+    eyebrow: { color: TVColors.brand, fontSize: rpx(12), fontWeight: "800", letterSpacing: rpx(2) },
+    title: { color: TVColors.text, fontSize: rpx(30), fontWeight: "700", marginTop: rpx(5) },
+    clockHint: { color: TVColors.textSecondary, fontSize: rpx(13), letterSpacing: rpx(2) },
+    hero: { height: rpx(214), borderRadius: rpx(22), overflow: "hidden", flexDirection: "row", backgroundColor: TVColors.raised, marginBottom: rpx(22) },
+    heroImage: { width: rpx(214), height: rpx(214) },
+    heroCopy: { flex: 1, paddingHorizontal: rpx(30), paddingVertical: rpx(24), justifyContent: "center" },
+    heroTitle: { color: TVColors.text, fontSize: rpx(29), fontWeight: "700", marginTop: rpx(8) },
+    heroArtist: { color: TVColors.textSecondary, fontSize: rpx(17), marginTop: rpx(7) },
+    heroActions: { flexDirection: "row", gap: rpx(14), marginTop: rpx(20) },
+    playButton: { width: rpx(132), height: rpx(52), borderRadius: rpx(26), backgroundColor: TVColors.play },
     playButtonFocused: { borderColor: TVColors.text },
-    playButtonBody: { flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 9 },
-    playButtonText: { color: TVColors.canvas, fontWeight: "800", fontSize: 17 },
-    secondaryButton: { width: 132, height: 52, borderRadius: 26, backgroundColor: TVColors.soft },
-    secondaryButtonText: { flex: 1, textAlign: "center", textAlignVertical: "center", fontSize: 17, color: TVColors.text },
-    sectionHeader: { height: 60, flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
-    tabs: { flexDirection: "row", gap: 12 },
-    tab: { width: 142, height: 50 },
-    tabText: { flex: 1, textAlign: "center", textAlignVertical: "center", color: TVColors.textSecondary, fontSize: 17, fontWeight: "600" },
+    playButtonBody: { flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: rpx(9) },
+    playButtonText: { color: TVColors.canvas, fontWeight: "800", fontSize: rpx(17) },
+    secondaryButton: { width: rpx(132), height: rpx(52), borderRadius: rpx(26), backgroundColor: TVColors.soft },
+    secondaryButtonText: { flex: 1, textAlign: "center", textAlignVertical: "center", fontSize: rpx(17), color: TVColors.text },
+    sectionHeader: { height: rpx(60), flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
+    tabs: { flexDirection: "row", gap: rpx(12) },
+    tab: { width: rpx(142), height: rpx(50) },
+    tabText: { flex: 1, textAlign: "center", textAlignVertical: "center", color: TVColors.textSecondary, fontSize: rpx(17), fontWeight: "600" },
     tabTextActive: { color: TVColors.text },
-    sectionHint: { color: TVColors.textSecondary, fontSize: 13 },
-    grid: { paddingBottom: 30 },
-    gridRow: { gap: 18, marginBottom: 18 },
-    sheetCard: { flex: 1, height: 218, maxWidth: "24%", backgroundColor: TVColors.raised },
-    sheetCardBody: { flex: 1, padding: 12 },
-    sheetCover: { width: "100%", flex: 1, borderRadius: 10 },
-    sheetTitle: { color: TVColors.text, fontSize: 16, fontWeight: "700", marginTop: 10 },
-    sheetMeta: { color: TVColors.textSecondary, fontSize: 13, marginTop: 3 },
-    empty: { width: 560, padding: 30, borderRadius: 16, backgroundColor: TVColors.raised },
-    emptyTitle: { color: TVColors.text, fontSize: 20, fontWeight: "700", marginBottom: 7 },
+    sectionHint: { color: TVColors.textSecondary, fontSize: rpx(13) },
+    grid: { paddingBottom: rpx(30) },
+    gridRow: { gap: rpx(18), marginBottom: rpx(18) },
+    sheetCard: { flex: 1, height: rpx(218), maxWidth: "24%", backgroundColor: TVColors.raised },
+    sheetCardBody: { flex: 1, padding: rpx(12) },
+    sheetCover: { width: "100%", flex: 1, borderRadius: rpx(10) },
+    sheetTitle: { color: TVColors.text, fontSize: rpx(16), fontWeight: "700", marginTop: rpx(10) },
+    sheetMeta: { color: TVColors.textSecondary, fontSize: rpx(13), marginTop: rpx(3) },
+    empty: { width: rpx(560), padding: rpx(30), borderRadius: rpx(16), backgroundColor: TVColors.raised },
+    emptyTitle: { color: TVColors.text, fontSize: rpx(20), fontWeight: "700", marginBottom: rpx(7) },
 });

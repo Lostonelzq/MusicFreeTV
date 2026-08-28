@@ -1,15 +1,18 @@
 import React, { useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, TextInput, View } from "react-native";
 import rpx, { vmax } from "@/utils/rpx";
 import { fontSizeConst } from "@/constants/uiConst";
 import useColors from "@/hooks/useColors";
 
 import ThemeText from "@/components/base/themeText";
-import { ScrollView, TextInput } from "react-native-gesture-handler";
+import { ScrollView } from "react-native-gesture-handler";
 import PanelBase from "../base/panelBase";
-import { hidePanel } from "../usePanel";
+import { dismissPanel, hidePanel } from "../usePanel";
 import PanelHeader from "../base/panelHeader";
 import { useI18N } from "@/core/i18n";
+import useOrientation from "@/hooks/useOrientation";
+import Dialog from "@/components/dialogs/components/base";
+import { TVColors } from "@/constants/tvTheme";
 
 interface ISimpleInputProps {
     title?: string;
@@ -30,11 +33,93 @@ export default function SimpleInput(props: ISimpleInputProps) {
         maxLength = 80,
         hints,
         title,
-        autoFocus = true,
+        autoFocus,
     } = props;
 
     const [input, setInput] = useState("");
+    const [inputFocused, setInputFocused] = useState(false);
     const colors = useColors();
+    const orientation = useOrientation();
+
+    const close = () => {
+        onCancel?.();
+        if (orientation === "horizontal") {
+            dismissPanel();
+        } else {
+            hidePanel();
+        }
+    };
+
+    const inputControl = (
+        <TextInput
+            value={input}
+            accessible
+            autoFocus={autoFocus ?? orientation === "vertical"}
+            hasTVPreferredFocus={orientation === "horizontal"}
+            accessibilityLabel={t("panel.simpleInput.inputLabel")}
+            accessibilityHint={placeholder}
+            onFocus={() => setInputFocused(true)}
+            onBlur={() => setInputFocused(false)}
+            onChangeText={setInput}
+            style={[
+                style.input,
+                orientation === "horizontal" && style.tvInput,
+                {
+                    color: colors.text,
+                    backgroundColor: colors.placeholder,
+                },
+                inputFocused && style.inputFocused,
+            ]}
+            placeholderTextColor={colors.textSecondary}
+            placeholder={placeholder ?? ""}
+            maxLength={maxLength}
+        />
+    );
+
+    const hintContent = hints?.length ? (
+        <View style={style.hints}>
+            {hints.map((hint, index) => (
+                <ThemeText
+                    key={`hint-index-${index}`}
+                    style={style.hintLine}
+                    fontSize="subTitle"
+                    fontColor="textSecondary">
+                    ￮ {hint}
+                </ThemeText>
+            ))}
+        </View>
+    ) : null;
+
+    if (orientation === "horizontal") {
+        return (
+            <Dialog onDismiss={close} containerStyle={style.tvDialog}>
+                <Dialog.Title withDivider>{title || ""}</Dialog.Title>
+                <Dialog.Content style={style.tvContent}>
+                    <ThemeText
+                        style={style.tvLabel}
+                        fontSize="content"
+                        fontWeight="medium">
+                        {placeholder || t("panel.simpleInput.inputLabel")}
+                    </ThemeText>
+                    {inputControl}
+                    {hintContent}
+                </Dialog.Content>
+                <Dialog.Actions
+                    actions={[
+                        {
+                            title: t("common.cancel"),
+                            onPress: close,
+                        },
+                        {
+                            title: t("common.confirm"),
+                            type: "primary",
+                            onPress: () => onOk(input, dismissPanel),
+                        },
+                    ]}
+                />
+            </Dialog>
+        );
+    }
 
     return (
         <PanelBase
@@ -44,49 +129,15 @@ export default function SimpleInput(props: ISimpleInputProps) {
                 <>
                     <PanelHeader
                         title={title || ""}
-                        onCancel={() => {
-                            onCancel?.();
-                            hidePanel();
-                        }}
+                        onCancel={close}
                         onOk={async () => {
                             onOk(input, hidePanel);
                         }}
                     />
 
-                    <TextInput
-                        value={input}
-                        accessible
-                        autoFocus={autoFocus}
-                        accessibilityLabel={t("panel.simpleInput.inputLabel")}
-                        accessibilityHint={placeholder}
-                        onChangeText={_ => {
-                            setInput(_);
-                        }}
-                        style={[
-                            style.input,
-                            {
-                                color: colors.text,
-                                backgroundColor: colors.placeholder,
-                            },
-                        ]}
-                        placeholderTextColor={colors.textSecondary}
-                        placeholder={placeholder ?? ""}
-                        maxLength={maxLength}
-                    />
+                    {inputControl}
                     <ScrollView>
-                        {hints?.length ? (
-                            <View style={style.hints}>
-                                {hints.map((_, index) => (
-                                    <ThemeText
-                                        key={`hint-index-${index}`}
-                                        style={style.hintLine}
-                                        fontSize="subTitle"
-                                        fontColor="textSecondary">
-                                        ￮ {_}
-                                    </ThemeText>
-                                ))}
-                            </View>
-                        ) : null}
+                        {hintContent}
                     </ScrollView>
                 </>
             )}
@@ -109,9 +160,30 @@ const style = StyleSheet.create({
     input: {
         margin: rpx(24),
         borderRadius: rpx(12),
+        borderWidth: 3,
+        borderColor: "transparent",
         fontSize: fontSizeConst.content,
         lineHeight: fontSizeConst.content * 1.5,
         padding: rpx(12),
+    },
+    inputFocused: {
+        borderColor: TVColors.focus,
+    },
+    tvDialog: {
+        width: "58%",
+        maxWidth: rpx(900),
+    },
+    tvContent: {
+        paddingHorizontal: rpx(36),
+        paddingVertical: rpx(32),
+    },
+    tvLabel: {
+        marginBottom: rpx(16),
+    },
+    tvInput: {
+        minHeight: rpx(76),
+        margin: 0,
+        paddingHorizontal: rpx(20),
     },
     hints: {
         marginTop: rpx(24),

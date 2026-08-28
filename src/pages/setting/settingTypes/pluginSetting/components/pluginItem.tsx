@@ -262,6 +262,7 @@ function _PluginItem(props: IPluginItemProps) {
                         <IconTextButton
                             key={index}
                             icon={it.icon}
+                            containerStyle={styles.option}
                             onPress={it.onPress}>
                             {it.title}
                         </IconTextButton>
@@ -318,11 +319,10 @@ export default PluginItem;
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        borderRadius: rpx(8),
+        borderRadius: rpx(12),
         marginHorizontal: rpx(24),
-        paddingVertical: rpx(18),
-        marginTop: rpx(36),
+        paddingVertical: rpx(16),
+        marginTop: rpx(24),
     },
     header: {
         paddingHorizontal: rpx(16),
@@ -343,18 +343,25 @@ const styles = StyleSheet.create({
     },
     description: {
         marginHorizontal: rpx(16),
-        marginVertical: rpx(24),
+        marginTop: rpx(12),
+        marginBottom: rpx(16),
         flexDirection: "row",
     },
     alternativePluginDescription: {
         marginHorizontal: rpx(16),
-        marginBottom: rpx(24),
+        marginBottom: rpx(16),
         flexDirection: "row",
     },
     contents: {
         flexDirection: "row",
-        justifyContent: "space-between",
+        alignItems: "center",
+        justifyContent: "flex-start",
         flexWrap: "wrap",
         gap: rpx(16),
+    },
+    option: {
+        height: rpx(72),
+        minHeight: rpx(72),
+        paddingVertical: 0,
     },
 });

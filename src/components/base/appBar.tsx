@@ -23,8 +23,8 @@ import Animated, {
     withTiming,
 } from "react-native-reanimated";
 import Portal from "./portal";
-import ListItem from "./listItem";
-import { IIconName } from "@/components/base/icon.tsx";
+import Icon, { IIconName } from "@/components/base/icon.tsx";
+import TVPressable from "@/components/tv/TVPressable";
 
 interface IAppBarProps {
     titleTextOpacity?: number;
@@ -33,6 +33,8 @@ interface IAppBarProps {
     actions?: Array<{
         icon: IIconName;
         onPress?: () => void;
+        accessibilityLabel?: string;
+        hasTVPreferredFocus?: boolean;
     }>;
     menu?: Array<{
         icon: IIconName;
@@ -81,6 +83,7 @@ export default function AppBar(props: IAppBarProps) {
     const [menuIconLayout, setMenuIconLayout] =
         useState<LayoutRectangle | null>(null);
     const scaleRate = useSharedValue(0);
+    const visibleMenu = menu.filter(it => it.show !== false);
 
     useEffect(() => {
         if (showMenu) {
@@ -144,6 +147,8 @@ export default function AppBar(props: IAppBarProps) {
                         color={contentColor}
                         style={[globalStyle.notShrink, styles.rightButton]}
                         onPress={action.onPress}
+                        accessibilityLabel={action.accessibilityLabel}
+                        hasTVPreferredFocus={action.hasTVPreferredFocus}
                     />
                 ))}
                 {actionComponent ?? null}
@@ -210,24 +215,32 @@ export default function AppBar(props: IAppBarProps) {
                             transformStyle,
                             styles.menu,
                         ]}>
-                        {menu.map(it =>
-                            it.show !== false ? (
-                                <ListItem
-                                    key={it.title}
-                                    withHorizontalPadding
-                                    heightType="small"
-                                    onPress={() => {
-                                        setShowMenu(false);
-                                        // async
-                                        setTimeout(() => {
-                                            it.onPress?.();
-                                        }, 20);
-                                    }}>
-                                    <ListItem.ListItemIcon icon={it.icon} />
-                                    <ListItem.Content title={it.title} />
-                                </ListItem>
-                            ) : null,
-                        )}
+                        {visibleMenu.map((it, index) => (
+                            <TVPressable
+                                key={it.title}
+                                accessibilityRole="menuitem"
+                                accessibilityLabel={it.title}
+                                hasTVPreferredFocus={index === 0}
+                                style={styles.menuItem}
+                                onPress={() => {
+                                    setShowMenu(false);
+                                    // async
+                                    setTimeout(() => {
+                                        it.onPress?.();
+                                    }, 20);
+                                }}>
+                                <View style={styles.menuItemBody}>
+                                    <Icon
+                                        name={it.icon}
+                                        color={colors.text}
+                                        size={rpx(42)}
+                                    />
+                                    <ThemeText numberOfLines={1}>
+                                        {it.title}
+                                    </ThemeText>
+                                </View>
+                            </TVPressable>
+                        ))}
                     </Animated.View>
                 </>
             </Portal>
@@ -283,5 +296,16 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.23,
         shadowRadius: 2.62,
         elevation: 4,
+    },
+    menuItem: {
+        width: "100%",
+        height: rpx(96),
+    },
+    menuItemBody: {
+        flex: 1,
+        flexDirection: "row",
+        alignItems: "center",
+        paddingHorizontal: rpx(24),
+        gap: rpx(24),
     },
 });

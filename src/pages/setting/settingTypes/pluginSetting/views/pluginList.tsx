@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-import { FlatList, StyleSheet, View } from "react-native";
-import rpx from "@/utils/rpx";
+import { FlatList, StyleSheet } from "react-native";
 import * as DocumentPicker from "expo-document-picker";
 import Loading from "@/components/base/loading";
 
@@ -16,7 +15,6 @@ import HorizontalSafeAreaView from "@/components/base/horizontalSafeAreaView.tsx
 import { showDialog } from "@/components/dialogs/useDialog";
 import { showPanel } from "@/components/panels/usePanel";
 import AppBar from "@/components/base/appBar";
-import Fab from "@/components/base/fab";
 import PluginItem from "../components/pluginItem";
 import { IIconName } from "@/components/base/icon.tsx";
 import { IInstallPluginResult } from "@/types/core/pluginManager";
@@ -264,65 +262,68 @@ export default function PluginList() {
         setLoading(false);
     }
 
+    function openInstallMenu() {
+        showPanel("SimpleSelect", {
+            header: t("pluginSetting.menu.installPlugin"),
+            candidates: [
+                {
+                    value: "从本地安装插件",
+                    title: t("pluginSetting.fabOptions.installFromLocal"),
+                },
+                {
+                    value: "从网络安装插件",
+                    title: t("pluginSetting.fabOptions.installFromNetwork"),
+                },
+                {
+                    value: "更新全部插件",
+                    title: t("pluginSetting.fabOptions.updateAllPlugins"),
+                },
+                {
+                    value: "更新订阅",
+                    title: t("pluginSetting.fabOptions.updateSubscription"),
+                },
+            ],
+            onPress(item) {
+                if (item.value === "从本地安装插件") {
+                    onInstallFromLocalClick();
+                } else if (item.value === "从网络安装插件") {
+                    onInstallFromNetworkClick();
+                } else if (item.value === "更新订阅") {
+                    onSubscribeClick();
+                } else if (item.value === "更新全部插件") {
+                    onUpdateAllClick();
+                }
+            },
+        });
+    }
+
     return (
         <>
-            <AppBar menu={menuOptions}>{t("sidebar.pluginManagement")}</AppBar>
+            <AppBar
+                actions={[
+                    {
+                        icon: "plus",
+                        accessibilityLabel: t("pluginSetting.menu.installPlugin"),
+                        hasTVPreferredFocus: true,
+                        onPress: openInstallMenu,
+                    },
+                ]}
+                menu={menuOptions}>
+                {t("sidebar.pluginManagement")}
+            </AppBar>
             <HorizontalSafeAreaView style={style.wrapper}>
-                <>
-                    {loading ? (
-                        <Loading />
-                    ) : (
-                        <FlatList
-                            ListEmptyComponent={Empty}
-                            ListFooterComponent={<View style={style.blank} />}
-                            data={plugins ?? []}
-                            keyExtractor={_ => _.hash}
-                            renderItem={({ item: plugin }) => (
-                                <PluginItem key={plugin.hash} plugin={plugin} />
-                            )}
-                        />
-                    )}
-
-                    <Fab
-                        icon="plus"
-                        onPress={() => {
-                            showPanel("SimpleSelect", {
-                                header: t("pluginSetting.menu.installPlugin"),
-                                candidates: [
-                                    {
-                                        value: "从本地安装插件",
-                                        title: t("pluginSetting.fabOptions.installFromLocal"),
-                                    },
-                                    {
-                                        value: "从网络安装插件",
-                                        title: t("pluginSetting.fabOptions.installFromNetwork"),
-                                    },
-                                    {
-                                        value: "更新全部插件",
-                                        title: t("pluginSetting.fabOptions.updateAllPlugins"),
-                                    },
-                                    {
-                                        value: "更新订阅",
-                                        title: t("pluginSetting.fabOptions.updateSubscription"),
-                                    },
-                                ],
-                                onPress(item) {
-                                    if (item.value === "从本地安装插件") {
-                                        onInstallFromLocalClick();
-                                    } else if (
-                                        item.value === "从网络安装插件"
-                                    ) {
-                                        onInstallFromNetworkClick();
-                                    } else if (item.value === "更新订阅") {
-                                        onSubscribeClick();
-                                    } else if (item.value === "更新全部插件") {
-                                        onUpdateAllClick();
-                                    }
-                                },
-                            });
-                        }}
+                {loading ? (
+                    <Loading />
+                ) : (
+                    <FlatList
+                        ListEmptyComponent={Empty}
+                        data={plugins ?? []}
+                        keyExtractor={_ => _.hash}
+                        renderItem={({ item: plugin }) => (
+                            <PluginItem key={plugin.hash} plugin={plugin} />
+                        )}
                     />
-                </>
+                )}
             </HorizontalSafeAreaView>
         </>
     );
@@ -332,9 +333,6 @@ const style = StyleSheet.create({
     wrapper: {
         width: "100%",
         flex: 1,
-    },
-    blank: {
-        height: rpx(200),
     },
 });
 

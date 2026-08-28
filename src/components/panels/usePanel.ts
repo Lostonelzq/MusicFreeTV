@@ -38,3 +38,11 @@ export function showPanel<T extends IPanelkeys>(
 export function hidePanel() {
     DeviceEventEmitter.emit("hidePanel");
 }
+
+/** Close panel content that is rendered as a dialog instead of PanelBase. */
+export function dismissPanel() {
+    panelInfoStore.setValue({
+        name: null,
+        payload: null,
+    });
+}

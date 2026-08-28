@@ -72,7 +72,7 @@ function ListItem(props: IListItemProps) {
 
     return (
         <TVPressable
-            style={styles.container}
+            style={[styles.container, { height: Size[heightType] }]}
             focusedStyle={{ backgroundColor: colors.listActive }}
             hasTVPreferredFocus={hasTVPreferredFocus}
             onPress={onPress}

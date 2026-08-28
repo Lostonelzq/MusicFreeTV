@@ -4,7 +4,6 @@ import {
     NativeEventSubscription,
     StyleProp,
     StyleSheet,
-    TouchableOpacity,
     TouchableWithoutFeedback,
     View,
     ViewStyle,
@@ -22,14 +21,16 @@ import Divider from "@/components/base/divider";
 import { fontSizeConst } from "@/constants/uiConst";
 import { ScrollView } from "react-native-gesture-handler";
 import useOrientation from "@/hooks/useOrientation.ts";
+import TVPressable from "@/components/tv/TVPressable";
 
 interface IDialogProps {
     onDismiss?: () => void;
     children?: ReactNode;
+    containerStyle?: StyleProp<ViewStyle>;
 }
 
 function Dialog(props: IDialogProps) {
-    const { children, onDismiss } = props;
+    const { children, onDismiss, containerStyle: customContainerStyle } = props;
 
     const sharedShowValue = useSharedValue(0);
     const colors = useColors();
@@ -102,6 +103,7 @@ function Dialog(props: IDialogProps) {
                 style={[
                     styles.dialogContainer,
                     dialogContainerStyle,
+                    customContainerStyle,
                     containerStyle,
                     scaleAnimationStyle,
                     {
@@ -182,6 +184,7 @@ interface IDialogActionsProps {
         title: string;
         type?: "normal" | "primary";
         show?: boolean;
+        hasTVPreferredFocus?: boolean;
         onPress?: () => void;
     }>;
     style?: StyleProp<ViewStyle>;
@@ -205,6 +208,7 @@ function Actions(props: IDialogActionsProps) {
                         onPress={it.onPress}
                         text={it.title}
                         type={it.type}
+                        hasTVPreferredFocus={it.hasTVPreferredFocus}
                     />
                 ),
             )}
@@ -231,13 +235,22 @@ function BottomButton(props: {
     text: string;
     style?: StyleProp<ViewStyle>;
     onPress?: () => void;
+    hasTVPreferredFocus?: boolean;
 }) {
-    const { type = "normal", text, style, onPress } = props;
+    const {
+        type = "normal",
+        text,
+        style,
+        onPress,
+        hasTVPreferredFocus,
+    } = props;
     const colors = useColors();
 
     return (
-        <TouchableOpacity
-            activeOpacity={0.6}
+        <TVPressable
+            accessibilityRole="button"
+            accessibilityLabel={text}
+            hasTVPreferredFocus={hasTVPreferredFocus}
             onPress={onPress}
             style={[
                 styles.bottomBtn,
@@ -250,7 +263,7 @@ function BottomButton(props: {
             <ThemeText color={type === "normal" ? undefined : "white"}>
                 {text}
             </ThemeText>
-        </TouchableOpacity>
+        </TVPressable>
     );
 }
 
@@ -280,7 +293,7 @@ const styles = StyleSheet.create({
         height: "100%",
         left: 0,
         top: 0,
-        backgroundColor: "rgba(0, 0, 0, 0.5)",
+        backgroundColor: "rgba(0, 0, 0, 0.64)",
     },
     dialogContainer: {
         position: "absolute",

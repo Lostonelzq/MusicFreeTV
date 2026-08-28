@@ -1,7 +1,6 @@
 import React from "react";
 import { StyleSheet } from "react-native";
 
-import MusicBar from "@/components/musicBar";
 import { SafeAreaView } from "react-native-safe-area-context";
 import StatusBar from "@/components/base/statusBar";
 import Theme from "@/core/theme";
@@ -12,7 +11,6 @@ export default function Home() {
         <SafeAreaView edges={["top", "bottom"]} style={styles.appWrapper}>
             <HomeStatusBar />
             <TVHome />
-            <MusicBar />
         </SafeAreaView>
     );
 }

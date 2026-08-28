@@ -4,15 +4,14 @@ import rpx from "@/utils/rpx";
 import ListItem from "../base/listItem";
 
 import LocalMusicSheet from "@/core/localMusicSheet";
-import { showPanel } from "../panels/usePanel";
 import TitleAndTag from "./titleAndTag";
 import ThemeText from "../base/themeText";
 import TrackPlayer from "@/core/trackPlayer";
 import Icon from "@/components/base/icon.tsx";
+import { ROUTE_PATH, useNavigate } from "@/core/router";
 
 interface IMusicItemProps {
     index?: string | number;
-    showMoreIcon?: boolean;
     musicItem: IMusic.IMusicItem;
     musicSheet?: IMusic.IMusicSheetItem;
     onItemPress?: (musicItem: IMusic.IMusicItem) => void;
@@ -21,19 +20,20 @@ interface IMusicItemProps {
     left?: () => JSX.Element;
     containerStyle?: StyleProp<ViewStyle>;
     highlight?: boolean
+    openPlayerOnPress?: boolean;
 }
 export default function MusicItem(props: IMusicItemProps) {
+    const navigate = useNavigate();
     const {
         musicItem,
         index,
         onItemPress,
         onItemLongPress,
-        musicSheet,
         itemPaddingRight,
-        showMoreIcon = true,
         left: Left,
         containerStyle,
         highlight = false,
+        openPlayerOnPress = true,
     } = props;
 
     return (
@@ -49,6 +49,9 @@ export default function MusicItem(props: IMusicItemProps) {
                     onItemPress(musicItem);
                 } else {
                     TrackPlayer.play(musicItem);
+                }
+                if (openPlayerOnPress) {
+                    navigate(ROUTE_PATH.MUSIC_DETAIL);
                 }
             }}>
             {Left ? <Left /> : null}
@@ -90,19 +93,6 @@ export default function MusicItem(props: IMusicItemProps) {
                     </View>
                 }
             />
-            {showMoreIcon ? (
-                <ListItem.ListItemIcon
-                    width={rpx(48)}
-                    position="none"
-                    icon="ellipsis-vertical"
-                    onPress={() => {
-                        showPanel("MusicItemOptions", {
-                            musicItem,
-                            musicSheet,
-                        });
-                    }}
-                />
-            ) : null}
         </ListItem>
     );
 }

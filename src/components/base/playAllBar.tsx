@@ -51,6 +51,7 @@ export default function (props: IProps) {
                             defaultPlayMusic,
                             musicList,
                         );
+                        navigate(ROUTE_PATH.MUSIC_DETAIL);
                     }
                 }}>
                 <Icon
